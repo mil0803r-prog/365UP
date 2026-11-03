@@ -2,11 +2,10 @@ import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { BarChart3, Calendar, CheckSquare, Flame, Sparkles, Target } from 'lucide-react';
 import { StoreProvider, uid, useCloud, useStore } from './store';
-import { firebaseReady, logout, watchUser } from './firebase';
+import { supabaseReady, logout, watchUser, type AppUser } from './supabase';
 import Login from './components/Login';
 import { PALETTES, applyPalette, initialPalette } from './palettes';
 import { Check } from 'lucide-react';
-import type { User } from 'firebase/auth';
 import { Header, Sheet } from './components/ui';
 import Hoy from './components/Hoy';
 import Tareas from './components/Tareas';
@@ -26,7 +25,7 @@ const TABS: [Tab, string, typeof Flame][] = [
 
 applyPalette(initialPalette());
 
-function Shell({ user }: { user: User | null }) {
+function Shell({ user }: { user: AppUser | null }) {
   const [themeOpen, setThemeOpen] = useState(false);
   const cloud = useCloud();
   const [tab, setTab] = useState<Tab>('hoy');
@@ -37,7 +36,7 @@ function Shell({ user }: { user: User | null }) {
   const { state, update } = useStore();
   const palette = state.palette || initialPalette();
   useEffect(() => { applyPalette(palette); }, [palette]);
-  const first = (user?.displayName || user?.email?.split('@')[0] || '').split(' ')[0];
+  const first = (user?.name || user?.email?.split('@')[0] || '').split(' ')[0];
   const today = format(new Date(), 'yyyy-MM-dd');
   const todays = state.events.filter((e) => e.date === today);
   const pending = state.tasks.filter((t) => t.date === today && t.status === 'pending');
@@ -131,16 +130,16 @@ function HabitForm({ onClose }: { onClose: () => void }) {
 }
 
 export default function App() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [checked, setChecked] = useState(false);
   const [guest, setGuest] = useState(() => {
     try { return localStorage.getItem('mil-guest') === '1'; } catch { return false; }
   });
   useEffect(() => watchUser((u) => { setUser(u); setChecked(true); }), []);
   if (!checked) return <div className="grid h-full place-items-center text-slate-400">Cargando…</div>;
-  if (!user && !guest && firebaseReady) return <Login onSkip={() => { setGuest(true); try { localStorage.setItem('mil-guest', '1'); } catch { /* sin almacenamiento */ } }} />;
+  if (!user && !guest && supabaseReady) return <Login onSkip={() => { setGuest(true); try { localStorage.setItem('mil-guest', '1'); } catch { /* sin almacenamiento */ } }} />;
   return (
-    <StoreProvider key={user?.uid || 'guest'} uid={user?.uid}>
+    <StoreProvider key={user?.id || 'guest'} uid={user?.id}>
       <Shell user={user} />
     </StoreProvider>
   );

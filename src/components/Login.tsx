@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { authMessage, loginEmail, loginGoogle, registerEmail } from '../firebase';
+import { authMessage, loginEmail, loginGoogle, registerEmail } from '../supabase';
 
 export default function Login({ onSkip }: { onSkip: () => void }) {
   const [mode, setMode] = useState<'in' | 'up'>('in');

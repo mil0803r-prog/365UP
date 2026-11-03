@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { saveCloud, watchCloud } from './firebase';
+import { saveCloud, watchCloud } from './supabase';
 import seed from './data/agenda.json';
 import type { AgendaEvent, AppState } from './types';
 
