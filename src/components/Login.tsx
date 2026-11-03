@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { authMessage, loginEmail, registerEmail } from '../supabase';
+import { authMessage, loginEmail, loginGoogle, registerEmail } from '../supabase';
 
 export default function Login({ onSkip }: { onSkip: () => void }) {
   const [mode, setMode] = useState<'in' | 'up'>('in');
@@ -21,6 +21,8 @@ export default function Login({ onSkip }: { onSkip: () => void }) {
         <p className="mt-2 text-slate-400">Hábitos, tareas, metas y agenda. Entra para tener tus datos en todos tus dispositivos.</p>
       </div>
       <div className="card grid gap-3 p-5">
+        <button disabled={busy} className="btn" onClick={() => run(loginGoogle)}>Continuar con Google</button>
+        <p className="text-center text-sm text-slate-500">o con tu correo</p>
         <input className="input" type="email" autoComplete="email" placeholder="Correo" value={email} onChange={(e) => setEmail(e.target.value)} />
         <input className="input" type="password" autoComplete={mode === 'in' ? 'current-password' : 'new-password'} placeholder="Contraseña" value={pass} onChange={(e) => setPass(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && email && pass && run(() => (mode === 'in' ? loginEmail : registerEmail)(email, pass))} />
         <button disabled={busy || !email || !pass} className="btn" onClick={() => run(() => (mode === 'in' ? loginEmail : registerEmail)(email, pass))}>{mode === 'in' ? 'Entrar' : 'Crear cuenta'}</button>
